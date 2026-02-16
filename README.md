@@ -152,20 +152,6 @@ The service will:
 
 Press `Ctrl+C` to stop the service.
 
-## Creating a Release
-
-To create a new release:
-
-1. Tag your commit with a version:
-   ```bash
-   git tag v1.0.0
-   git push origin v1.0.0
-   ```
-
-2. GitHub Actions will automatically:
-   - Build the binary
-   - Create a release on the releases page
-   - Upload the compiled binary as a downloadable asset
 
 ## How It Works
 

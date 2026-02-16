@@ -60,7 +60,7 @@ void monitor_and_mute(GDBusConnection* connection) {
     char* name;
 
     while (g_variant_iter_next(iter, "s", &name)) {
-        if (g_str_has_prefix(name, "org.mpris.MediaPlayer2.")) {
+        if (g_str_has_prefix(name, "org.mpris.MediaPlayer2.spotify")) {
             // Get Metadata
             GVariant* v = g_dbus_connection_call_sync(
                 connection, name, "/org/mpris/MediaPlayer2",

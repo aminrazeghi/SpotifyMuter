@@ -1,0 +1,73 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'  # Trigger on version tags like v1.0.0, v1.2.3, etc.
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            cmake \
+            g++ \
+            libglib2.0-dev \
+            libgio2.0-cil-dev \
+            pkg-config
+      
+      - name: Build project
+        run: |
+          mkdir -p build
+          cd build
+          cmake ..
+          make
+          strip spotify_muter  # Strip debug symbols to reduce size
+      
+      - name: Create release archive
+        run: |
+          cd build
+          tar -czf spotify-ad-muter-linux-x64.tar.gz spotify_muter
+          sha256sum spotify-ad-muter-linux-x64.tar.gz > spotify-ad-muter-linux-x64.tar.gz.sha256
+      
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            build/spotify-ad-muter-linux-x64.tar.gz
+            build/spotify-ad-muter-linux-x64.tar.gz.sha256
+            install.sh
+            uninstall.sh
+          body: |
+            ## Spotify Ad Muter Service ${{ github.ref_name }}
+            
+            Automatically mutes Spotify when ads are detected.
+            
+            ### Installation
+            
+            1. Download `spotify-ad-muter-linux-x64.tar.gz`
+            2. Extract: `tar -xzf spotify-ad-muter-linux-x64.tar.gz`
+            3. Run: `./spotify_muter`
+            
+            ### Verify Download
+            
+            ```bash
+            sha256sum -c spotify-ad-muter-linux-x64.tar.gz.sha256
+            ```
+            
+            ### Requirements
+            
+            - Linux with D-Bus
+            - GLib 2.0
+            - Spotify desktop client
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
